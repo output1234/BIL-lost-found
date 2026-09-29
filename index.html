@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Бюро находок</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Playfair+Display:wght@600;700&display=swap" />
+<style>
+:root{--bg:#FAF7EF;--surface:#FFFFFF;--ink:#1C1B19;--ink-muted:#6B6862;--line:#E7E1D2;--green:#147A4B;--green-bg:#E6F4EC;--green-line:#BFE6D0;--red:#C63D2F;--red-bg:#FBEAE7;--red-line:#F2C9C1;--sand:#F1ECDD;--navy:#122A52;--navy-deep:#0B1B36;--gold:#C9A227;--gold-light:#F3E1A8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+background:radial-gradient(700px 520px at 100% -10%,rgba(201,162,39,0.22),transparent 60%),radial-gradient(640px 500px at -10% 60%,rgba(30,70,140,0.35),transparent 60%),radial-gradient(600px 460px at 90% 105%,rgba(201,162,39,0.14),transparent 58%),linear-gradient(160deg,#03060D 0%,#0B1B36 52%,#0E2347 100%);background-attachment:fixed;position:relative;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0.10;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9A227' stroke-width='0.5' stroke-linejoin='round'%3E%3Cpath d='M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z'/%3E%3Cpath d='M12 8l1.2 2.4 2.6.4-1.9 1.9.5 2.6L12 14l-2.4 1.3.5-2.6-1.9-1.9 2.6-.4L12 8z'/%3E%3C/svg%3E") center 45%/min(78vmin,620px) no-repeat;}
+body::after{content:"БИЛ";position:fixed;left:0;right:0;top:calc(45% + min(30vmin,240px));text-align:center;z-index:-1;pointer-events:none;font-family:'Playfair Display',serif;font-weight:700;font-size:min(9vmin,72px);letter-spacing:0.3em;color:#C9A227;opacity:0.10;}
+.wrap{max-width:1180px;margin:0 auto;padding:36px 20px 70px;position:relative;}
+h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif;margin:0;}
+.top-row{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:28px 26px 24px;margin-bottom:24px;background:linear-gradient(120deg,rgba(18,42,82,0.85) 0%,rgba(11,27,54,0.9) 60%,rgba(20,45,90,0.85) 100%);border:1px solid rgba(201,162,39,0.35);border-top:3px solid var(--gold);}
+.hero::before{content:"";position:absolute;border-radius:50%;pointer-events:none;width:220px;height:220px;border:2px solid var(--gold);opacity:0.35;top:-90px;right:-60px;}
+.hero .top-row{position:relative;}
+.hero .brand h1{color:var(--gold-light);font-family:'Playfair Display',serif;font-size:30px;font-weight:700;}
+.brand p{font-size:14.5px;color:#C9D2E6;margin-top:6px;max-width:440px;}
+.add-btn{display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;color:var(--navy-deep);background:linear-gradient(135deg,#E8C766,var(--gold));border:none;border-radius:12px;padding:12px 18px;cursor:pointer;box-shadow:0 8px 20px rgba(201,162,39,0.35);}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:22px;}
+.stat{display:flex;align-items:center;gap:8px;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+.stat b{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#F3E1A8;}
+.stat .label{font-size:13px;color:#B9C3D9;}
+.search-box{position:relative;margin-bottom:16px;}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#A8A399;}
+.search-box input{width:100%;font-size:14.5px;font-family:inherit;padding:13px 14px 13px 40px;border-radius:12px;border:1px solid var(--line);outline:none;background:var(--surface);color:var(--ink);}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:26px;}
+.pill-group{display:flex;gap:6px;background:var(--sand);padding:4px;border-radius:12px;flex-wrap:wrap;}
+.pill{border:none;border-radius:9px;padding:8px 14px;font-size:13.5px;font-weight:600;cursor:pointer;background:transparent;color:var(--ink-muted);font-family:inherit;}
+.pill.active{background:var(--navy);color:#FDFDFB;}
+.pill .count{opacity:0.65;font-weight:500;}
+select.cat-select{font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid #E0DDD4;border-radius:12px;padding:9px 12px;cursor:pointer;outline:none;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;}
+.card{cursor:pointer;transition:transform 160ms ease,box-shadow 160ms ease;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;}
+.card-accent{height:5px;width:100%;}
+.card-photo{position:relative;aspect-ratio:4/3;background:var(--sand);}
+.card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#F1EFE9,#E7E4DD);color:#A8A399;}
+.badge-id{position:absolute;top:10px;left:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(28,27,25,0.55);color:#FDFDFB;padding:3px 8px;border-radius:999px;}
+.badge-status{position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12.5px;font-weight:600;}
+.badge-status.lost{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line);}
+.badge-status.found{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+.stamp{position:absolute;bottom:10px;right:-6px;transform:rotate(-10deg);display:flex;align-items:center;background:rgba(20,122,75,0.94);color:#FDFDFB;padding:6px 14px 6px 10px;border-radius:10px;}
+.perforation{height:0;border-top:1.5px dashed #DEDAD1;margin:0 14px;}
+.card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.card-body h3{font-size:17px;font-weight:600;line-height:1.25;}
+.meta{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--ink-muted);}
+.meta span{display:flex;align-items:center;gap:6px;}
+.meta span.ttl{color:var(--green);font-size:12px;font-weight:500;}
+.desc{font-size:13.5px;color:#413F3B;margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-footer{margin-top:auto;padding-top:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.cat-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
+.mark-btn{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid var(--green-line);border-radius:10px;padding:8px 12px;cursor:pointer;white-space:nowrap;}
+.card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,0.35);}
+.detail-photo{position:relative;aspect-ratio:4/3;background:var(--sand);}
+.detail-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.detail-title{font-size:22px;font-weight:700;line-height:1.25;}
+.detail-desc{font-size:15px;line-height:1.6;color:#2B2A27;white-space:pre-wrap;word-break:break-word;margin:0;}
+.detail-label{font-size:12px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.detail-meta{display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--ink-muted);}
+.detail-meta span{display:flex;align-items:center;gap:8px;}
+@keyframes pop{0%{transform:scale(1);}35%{transform:scale(1.03);}100%{transform:scale(1);}}
+.just-found{animation:pop 480ms ease;}
+.empty{text-align:center;padding:60px 20px;color:#8C97B0;}
+.overlay{position:fixed;inset:0;background:rgba(28,27,25,0.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
+.modal{background:#FDFDFB;border-radius:20px;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;border:1px solid var(--line);}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 0;}
+.modal-head h2{font-size:19px;font-weight:600;}
+.close-btn{border:none;background:var(--sand);border-radius:999px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-muted);}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:14px;}
+.photo-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:140px;border-radius:14px;border:1.5px dashed #D8D4CB;background:#F7F5F0;cursor:pointer;overflow:hidden;color:#A8A399;position:relative;}
+.photo-drop img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:none;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field span{font-size:12.5px;color:var(--ink-muted);font-weight:500;}
+.field input,.field select,.field textarea{font-family:inherit;font-size:14px;color:var(--ink);background:#FFF;border:1px solid #E0DDD4;border-radius:10px;padding:10px 12px;outline:none;width:100%;}
+.row-2{display:flex;gap:12px;}
+.row-2>*{flex:1;}
+.submit-btn{margin-top:4px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;color:#FDFDFB;background:var(--navy);border:none;border-radius:12px;padding:13px 16px;cursor:pointer;}
+.submit-btn:disabled{background:#C9C6BE;cursor:not-allowed;}
+.footer-note{text-align:center;font-size:12.5px;color:#8C97B0;margin-top:34px;}
+.crest-bar{background:linear-gradient(90deg,var(--navy-deep),var(--navy));color:var(--gold-light);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 16px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;text-align:center;}
+.crest-bar svg{color:var(--gold);flex-shrink:0;}
+.nav-bar{max-width:1180px;margin:0 auto;padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.nav-tabs{display:flex;gap:8px;}
+.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.nav-tab{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;padding:10px 16px;border-radius:11px;border:1px solid var(--gold);cursor:pointer;background:transparent;color:var(--gold-light);}
+.nav-tab.active{background:linear-gradient(135deg,#E8C766,var(--gold));color:var(--navy-deep);}
+.whoami{font-size:13px;color:#C9D2E6;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.role-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;white-space:nowrap;}
+.role-badge.admin{background:var(--gold-light);color:#7A5A00;}
+.role-badge.participant{background:var(--sand);color:var(--navy);}
+.role-switch{border:1px solid var(--gold);background:linear-gradient(135deg,#E8C766,var(--gold));color:var(--navy-deep);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap;}
+.role-switch.to-participant{background:transparent;color:var(--gold-light);}
+.users-toggle{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;color:var(--ink-muted);font-family:inherit;}
+.users-panel{max-width:1180px;margin:8px auto 0;padding:0 20px;}
+.users-panel .inner{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;}
+.user-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:13px;}
+.user-name{font-weight:600;white-space:nowrap;}
+.user-meta{color:var(--ink-muted);font-size:12px;flex:1;}
+.promote-btn{border:none;background:var(--navy);color:#FDFDFB;border-radius:8px;padding:6px 10px;font-size:11.5px;cursor:pointer;white-space:nowrap;}
+.users-empty{font-size:13px;color:#A8A399;padding:6px 8px;}
+.role-toggle-btn{flex:1;padding:9px;border-radius:10px;border:1px solid #E0DDD4;background:#FFF;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-muted);font-family:inherit;}
+.role-toggle-btn.active{background:var(--navy);color:#FDFDFB;border-color:var(--navy);}
+.notice{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#FDFDFB;padding:11px 20px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity 200ms,transform 200ms;z-index:200;max-width:90vw;}
+.notice.show{opacity:1;transform:translate(-50%,0);}
+.leader-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.leader-row{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;}
+.leader-rank{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink-muted);background:var(--sand);flex-shrink:0;}
+.leader-rank.top1,.leader-rank.top2,.leader-rank.top3{font-size:17px;background:transparent;}
+.leader-row.top1{background:linear-gradient(90deg,#FFF6DF,var(--surface) 55%);border-color:#F3E0A8;}
+.leader-row.top2{background:linear-gradient(90deg,#F2F2F5,var(--surface) 55%);border-color:#DADADF;}
+.leader-row.top3{background:linear-gradient(90deg,#FBEADF,var(--surface) 55%);border-color:#EBCBA9;}
+.leader-name{flex:1;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;}
+.leader-points{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--green);font-size:15.5px;}
+@media (prefers-reduced-motion:reduce){.just-found,.notice{transition:none !important;animation:none !important;}}
+</style>
+</head>
+<body>
+  <div class="crest-bar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z"/><path d="M12 8l1.2 2.4 2.6.4-1.9 1.9.5 2.6L12 14l-2.4 1.3.5-2.6-1.9-1.9 2.6-.4L12 8z"/></svg>
+    Ақтөбе Білім-Инновация Лицейі · БИЛ
+  </div>
+
+  <div id="auth-gate" class="overlay" style="display:none;z-index:100;">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-head"><h2>Представьтесь</h2></div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--ink-muted);margin:0;">Чтобы попасть на сайт, укажите, кто вы — это будут видеть остальные.</p>
+        <div class="field">
+          <span>Кто вы?</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" id="role-student-btn" class="role-toggle-btn active" onclick="selectRegKind('student')">Ученик</button>
+            <button type="button" id="role-teacher-btn" class="role-toggle-btn" onclick="selectRegKind('teacher')">Учитель</button>
+            <button type="button" id="role-tutor-btn" class="role-toggle-btn" onclick="selectRegKind('tutor')">Тьютор</button>
+          </div>
+        </div>
+        <input type="hidden" id="reg-kind" value="student" />
+        <div class="field" id="reg-class-field"><span>Класс</span>
+          <select id="reg-class" onchange="onRegClassChange()"><option value="">Выберите класс</option></select>
+        </div>
+        <div class="field" id="reg-name-field" style="display:none"><span>Вы в списке класса</span>
+          <select id="reg-name-select" onchange="onRegNameSelectChange()"><option value="">Выберите себя</option></select>
+          <div id="reg-name-confirm" style="display:none;font-size:13px;color:var(--green);font-weight:600;"></div>
+        </div>
+        <div class="field" id="reg-tutor-field" style="display:none"><span>Вы в списке тьюторов</span>
+          <select id="reg-tutor-select" onchange="onRegTutorSelectChange()"><option value="">Выберите себя</option></select>
+          <div id="reg-tutor-confirm" style="display:none;font-size:13px;color:var(--green);font-weight:600;"></div>
+        </div>
+        <div id="reg-manual-fields" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="field"><span>Имя</span><input id="reg-firstname" oninput="updateRegisterState()" placeholder="Имя" /></div>
+          <div class="field"><span>Фамилия</span><input id="reg-lastname" oninput="updateRegisterState()" placeholder="Фамилия" /></div>
+        </div>
+        <div class="field"><span>Код администратора (необязательно)</span>
+          <input id="reg-admin-code" placeholder="Оставьте пустым, если кода нет" />
+        </div>
+        <button class="submit-btn" id="reg-submit" disabled onclick="submitRegistration()">Войти на сайт</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="nav-lostfound" onclick="showPage('lostfound')">Бюро находок</button>
+      <button class="nav-tab" id="nav-classes" onclick="showPage('classes')">Доска почёта</button>
+    </div>
+    <div class="nav-right">
+      <button class="users-toggle" onclick="toggleUsersPanel()">👥 Участники</button>
+      <span id="whoami" class="whoami"></span>
+      <button class="role-switch" id="role-switch" onclick="onRoleSwitchClick()"></button>
+    </div>
+  </div>
+  <div id="users-panel" class="users-panel" style="display:none"><div class="inner" id="users-list"></div></div>
+
+  <div id="page-lostfound" class="page">
+  <div class="wrap">
+    <div class="hero"><div class="top-row">
+      <div class="brand"><h1>Бюро находок</h1><p>Быстро узнайте, что потеряно, а что уже нашлось.</p></div>
+      <button class="add-btn" onclick="openModal()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Добавить вещь
+      </button>
+    </div></div>
+    <div class="stats" id="stats"></div>
+    <div class="search-box">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" placeholder="Поиск по названию, месту или описанию..." oninput="onSearch(this.value)" />
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="grid"></div>
+    <p class="footer-note">Данные этой страницы общие: их видят и могут дополнять все, у кого есть ссылка. Найденные вещи автоматически исчезают из списка через час.</p>
+  </div>
+  </div>
+
+  <div id="page-classes" class="page" style="display:none">
+    <div class="wrap">
+      <div class="hero"><div class="top-row"><div class="brand"><h1>Доска почёта</h1><p>Балл начисляется автоматически каждому, кто подаёт заявление о потерянной вещи.</p></div></div></div>
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:12px;color:#F3E1A8;">Рейтинг участников</h2>
+      <div class="leader-list" id="leaderboard"></div>
+      <p class="footer-note">1 заявление о потерянной вещи = 1 балл. Баллы не пропадают, даже если вещь потом найдётся. Данные общие для всех, у кого есть ссылка.</p>
+    </div>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="notice" class="notice"></div>
+<script>
+  const CATEGORIES = ["Электроника","Документы","Ключи","Одежда","Аксессуары","Другое"];
+  const CATEGORY_COLORS = {
+    "Электроника":{bg:"#E7ECF5",fg:"#1F3A66"},"Документы":{bg:"#F3E9EC",fg:"#7A2E3A"},"Ключи":{bg:"#F7EFD9",fg:"#8A6A1E"},
+    "Одежда":{bg:"#EDE7F5",fg:"#5B3E8E"},"Аксессуары":{bg:"#E3F0EF",fg:"#1F6F78"},"Другое":{bg:"#EDEBE6",fg:"#4B4640"}
+  };
+  function categoryColor(cat){ return CATEGORY_COLORS[cat] || {bg:"#EDEBE6",fg:"#4B4640"}; }
+  function hashColor(str){
+    let hash = 0;
+    for (let i = 0; i < str.length; i++){ hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+    const hue = Math.abs(hash) % 360;
+    return { solid: `hsl(${hue},34%,42%)` };
+  }
+  function avatarHTML(name, size){
+    size = size || 26;
+    const c = hashColor(name);
+    const initials = name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase();
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${c.solid};color:#fff;font-size:${Math.round(size*0.42)}px;font-weight:700;font-family:'Space Grotesk',sans-serif;flex-shrink:0;">${esc(initials)}</span>`;
+  }
+
+  const SEED_ITEMS = [
+    {id:"00042", title:"Чёрный рюкзак Nike", description:"Городской рюкзак с двумя молниями и красной нашивкой сбоку. Внутри учебник по физике.", location:"ст. м. Спортивная", date:"2026-08-28", category:"Аксессуары", status:"lost"},
+    {id:"00041", title:"Связка ключей с брелоком-совой", description:"Три ключа и брелок в виде совы. Потеряны у входа в парк.", location:"Парк Горького", date:"2026-08-30", category:"Ключи", status:"lost"},
+    {id:"00035", title:"Зонт-трость коричневый", description:"Деревянная ручка, забыт в вагоне метро в районе полудня.", location:"Линия 1, вагон №3", date:"2026-08-20", category:"Другое", status:"lost"}
+  ];
+
+  let state = { items: [], query: "", statusFilter: "all", categoryFilter: "all", justFoundId: null };
+  let draftPhoto = null;
+
+  // ================= Хранилище =================
+  // Общие данные — в db-хранилище артефакта; личный профиль — в localStorage этого браузера.
+  let _db;
+  async function getDb(){
+    if (_db === undefined){
+      try{ _db = (window.claude && await window.claude.use("db")) || null; }catch(e){ _db = null; }
+    }
+    return _db;
+  }
+  async function loadShared(name){
+    const db = await getDb();
+    if (!db) return null;
+    try{
+      const s = await db.doc('app/' + name).get();
+      if (s.exists) return s.data().list || null;
+    }catch(e){}
+    return null;
+  }
+  async function saveShared(name, list){
+    const db = await getDb();
+    if (!db) return;
+    try{ await db.doc('app/' + name).set({ list }); }catch(e){}
+  }
+
+  // ================= Аккаунты и роли =================
+  let currentUser = null;
+  let usersCache = [];
+
+  function loadMyProfile(){
+    try{ const v = localStorage.getItem('myProfile'); if (v) return JSON.parse(v); }catch(e){}
+    return null;
+  }
+  function saveMyProfile(p){ try{ localStorage.setItem('myProfile', JSON.stringify(p)); }catch(e){} }
+  async function loadUsers(){
+    const l = await loadShared('users');
+    if (l) usersCache = l;
+    return usersCache;
+  }
+  async function saveUsers(list){ usersCache = list; await saveShared('users', list); }
+
+  function genUserId(){ return 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8); }
+  function isAdmin(){ return !!(currentUser && currentUser.role === 'admin'); }
+  function roleLabel(u){ return u.role === 'admin' ? 'Админ' : 'Участник'; }
+  function requireAdmin(t){
+    if (!isAdmin()){ showNotice((t || 'Это действие') + ' доступно только админу.'); return false; }
+    return true;
+  }
+
+  async function bootAuth(){
+    const profile = loadMyProfile();
+    if (profile){
+      currentUser = profile;
+      if (typeof currentUser.points !== 'number') currentUser.points = 0;
+      const users = await loadUsers();
+      const match = users.find(u => u.id === currentUser.id);
+      if (match){
+        if (typeof match.points !== 'number') match.points = 0;
+        const need = reconcileRole(match);
+        currentUser.points = match.points;
+        saveMyProfile(currentUser);
+        if (need) saveUsers(users);
+      } else { users.push(currentUser); saveUsers(users); }
+      finishBoot();
+    } else { showAuthGate(); }
+  }
+
+  function showAuthGate(){
+    populateRegClassOptions();
+    selectRegKind('student');
+    document.getElementById('auth-gate').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function populateRegClassOptions(){
+    document.getElementById('reg-class').innerHTML = '<option value="">Выберите класс</option>' +
+      CLASS_NAMES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  }
+  function $(id){ return document.getElementById(id); }
+
+  function selectRegKind(kind){
+    $('reg-kind').value = kind;
+    $('reg-class-field').style.display = kind === 'student' ? '' : 'none';
+    $('role-student-btn').classList.toggle('active', kind === 'student');
+    $('role-teacher-btn').classList.toggle('active', kind === 'teacher');
+    $('role-tutor-btn').classList.toggle('active', kind === 'tutor');
+    if (kind === 'teacher'){
+      $('reg-name-field').style.display = 'none';
+      $('reg-tutor-field').style.display = 'none';
+      $('reg-manual-fields').style.display = 'flex';
+      $('reg-firstname').value = ''; $('reg-lastname').value = '';
+    } else if (kind === 'tutor'){
+      $('reg-name-field').style.display = 'none';
+      populateTutorOptions();
+      $('reg-tutor-field').style.display = '';
+      $('reg-manual-fields').style.display = 'none';
+      $('reg-firstname').value = ''; $('reg-lastname').value = '';
+    } else {
+      $('reg-tutor-field').style.display = 'none';
+      onRegClassChange();
+    }
+    updateRegisterState();
+  }
+  function populateTutorOptions(){
+    $('reg-tutor-select').innerHTML = '<option value="">Выберите себя</option>' +
+      TUTORS.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
+      '<option value="__manual__">Меня нет в списке</option>';
+    $('reg-tutor-confirm').style.display = 'none';
+  }
+  function onRegClassChange(){
+    const cls = $('reg-class').value;
+    const roster = ROSTER[cls];
+    $('reg-name-confirm').style.display = 'none';
+    if (roster && roster.length){
+      $('reg-name-select').innerHTML = '<option value="">Выберите себя</option>' +
+        roster.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
+        '<option value="__manual__">Меня нет в списке</option>';
+      $('reg-name-field').style.display = '';
+      $('reg-manual-fields').style.display = 'none';
+      $('reg-firstname').value = ''; $('reg-lastname').value = '';
+    } else {
+      $('reg-name-field').style.display = 'none';
+      $('reg-manual-fields').style.display = 'flex';
+    }
+    updateRegisterState();
+  }
+  function onRegNameSelectChange(){
+    const val = $('reg-name-select').value;
+    const manual = $('reg-manual-fields'), conf = $('reg-name-confirm');
+    if (val === '__manual__'){
+      manual.style.display = 'flex'; conf.style.display = 'none';
+      $('reg-firstname').value = ''; $('reg-lastname').value = '';
+    } else if (val){
+      manual.style.display = 'none';
+      const parts = val.trim().split(/\s+/);
+      const ln = parts[0] || '', fn = parts.slice(1).join(' ') || '';
+      $('reg-lastname').value = ln; $('reg-firstname').value = fn;
+      conf.textContent = `Вы: ${ln} ${fn}`; conf.style.display = '';
+    } else { manual.style.display = 'none'; conf.style.display = 'none'; }
+    updateRegisterState();
+  }
+  function onRegTutorSelectChange(){
+    const val = $('reg-tutor-select').value;
+    const manual = $('reg-manual-fields'), conf = $('reg-tutor-confirm');
+    if (val === '__manual__'){
+      manual.style.display = 'flex'; conf.style.display = 'none';
+      $('reg-firstname').value = ''; $('reg-lastname').value = '';
+    } else if (val){
+      manual.style.display = 'none';
+      $('reg-firstname').value = val; $('reg-lastname').value = '';
+      conf.textContent = `Вы: ${val}`; conf.style.display = '';
+    } else { manual.style.display = 'none'; conf.style.display = 'none'; }
+    updateRegisterState();
+  }
+  function updateRegisterState(){
+    const fn = $('reg-firstname').value.trim(), ln = $('reg-lastname').value.trim();
+    const kind = $('reg-kind').value, cls = $('reg-class').value;
+    const nameVisible = $('reg-name-field').style.display !== 'none';
+    const nameVal = $('reg-name-select').value;
+    const tutorVisible = $('reg-tutor-field').style.display !== 'none';
+    const tutorVal = $('reg-tutor-select').value;
+    let ok;
+    if (kind === 'teacher') ok = fn && ln;
+    else if (kind === 'tutor'){
+      if (tutorVisible && tutorVal && tutorVal !== '__manual__') ok = true; else ok = !!fn;
+    } else {
+      if (!cls) ok = false;
+      else if (nameVisible && nameVal && nameVal !== '__manual__') ok = true;
+      else ok = fn && ln;
+    }
+    $('reg-submit').disabled = !ok;
+  }
+
+  const ADMIN_CODE = "AsFhrYT138";
+
+  async function submitRegistration(){
+    const firstName = $('reg-firstname').value.trim();
+    const lastName = $('reg-lastname').value.trim();
+    const kind = $('reg-kind').value;
+    const classOrRole = kind === 'teacher' ? 'Учитель' : kind === 'tutor' ? 'Тьютор' : $('reg-class').value;
+    if (!firstName) return;
+    if (kind !== 'tutor' && !lastName) return;
+    if (kind === 'student' && !classOrRole) return;
+    const role = $('reg-admin-code').value.trim() === ADMIN_CODE ? 'admin' : 'participant';
+    const users = await loadUsers();
+    const newUser = { id: genUserId(), firstName, lastName, classOrRole, isTeacher: kind === 'teacher', role, points: 0, registeredAt: Date.now() };
+    users.push(newUser);
+    await saveUsers(users);
+    saveMyProfile(newUser);
+    currentUser = newUser;
+    $('auth-gate').style.display = 'none';
+    document.body.style.overflow = '';
+    finishBoot();
+  }
+
+  // Роль, выбранная на этом устройстве, главнее общего списка:
+  // админ остаётся админом, пока сам не нажмёт «Стать участником».
+  // Из общего списка роль можно только повысить (назначение другим админом).
+  function reconcileRole(match){
+    if (currentUser.role === 'admin'){
+      if (match.role !== 'admin'){ match.role = 'admin'; return true; }
+      return false;
+    }
+    const out = currentUser.optedOutAt || 0;
+    if (match.role === 'admin'){
+      if (!out || (match.promoted || 0) > out){ currentUser.role = 'admin'; currentUser.optedOutAt = 0; return false; }
+      match.role = 'participant'; return true;
+    }
+    return false;
+  }
+  async function setRole(role){
+    const users = await loadUsers();
+    const u = users.find(x => x.id === currentUser.id);
+    if (u) u.role = role; else { currentUser.role = role; users.push(currentUser); }
+    currentUser.role = role;
+    currentUser.optedOutAt = role === 'participant' ? Date.now() : 0;
+    await saveUsers(users);
+    saveMyProfile(currentUser);
+    renderWhoAmI(); renderUsersPanel(); renderAll();
+    if ($('page-classes').style.display !== 'none') renderParticipantsLeaderboard();
+  }
+  async function onRoleSwitchClick(){
+    if (isAdmin()){
+      await setRole('participant');
+      showPage('lostfound');
+      showNotice('Вы переключились в режим участника.');
+    } else {
+      openAdminCodeModal();
+    }
+  }
+  function openAdminCodeModal(){
+    $('modal-root').innerHTML = `
+      <div class="overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal" style="max-width:380px;">
+          <div class="modal-head"><h2>Вход как админ</h2>
+            <button class="close-btn" onclick="closeModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="modal-body">
+            <div class="field"><span>Код администратора</span>
+              <input id="switch-code" type="password" placeholder="Введите код" autocomplete="off" />
+              <div id="switch-err" style="display:none;font-size:12.5px;color:var(--red);font-weight:600;">Неверный код</div>
+            </div>
+            <button class="submit-btn" onclick="submitAdminCode()">Войти</button>
+          </div>
+        </div>
+      </div>`;
+    const inp = $('switch-code');
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitAdminCode(); });
+    inp.focus();
+  }
+  async function submitAdminCode(){
+    const v = $('switch-code').value.trim();
+    if (v !== ADMIN_CODE){ $('switch-err').style.display = ''; return; }
+    closeModal();
+    await setRole('admin');
+    showNotice('Вы вошли как админ.');
+  }
+
+  function finishBoot(){
+    renderWhoAmI(); renderUsersPanel(); init();
+    showPage(location.hash === '#classes' ? 'classes' : 'lostfound');
+    setInterval(pollUsers, 6000);
+  }
+  function renderWhoAmI(){
+    const fullName = `${currentUser.firstName} ${currentUser.lastName}`;
+    $('whoami').innerHTML = `${avatarHTML(fullName, 24)} ${esc(fullName)} · ${esc(currentUser.classOrRole)} · ${currentUser.points || 0} б. <span class="role-badge ${currentUser.role}">${roleLabel(currentUser)}</span>`;
+    $('nav-classes').style.display = isAdmin() ? '' : 'none';
+    const sw = $('role-switch');
+    sw.textContent = isAdmin() ? '👤 Стать участником' : '🔑 Войти как админ';
+    sw.classList.toggle('to-participant', isAdmin());
+    if (!isAdmin() && $('page-classes').style.display !== 'none') showPage('lostfound');
+  }
+  function renderUsersPanel(){
+    const el = $('users-list');
+    if (!el) return;
+    if (!usersCache.length){ el.innerHTML = `<div class="users-empty">Пока никого нет.</div>`; return; }
+    el.innerHTML = usersCache.map(u => `
+      <div class="user-row">
+        ${avatarHTML(u.firstName + ' ' + u.lastName, 24)}
+        <span class="user-name">${esc(u.firstName)} ${esc(u.lastName)}</span>
+        <span class="user-meta">${esc(u.classOrRole)} · ${u.points || 0} б.</span>
+        <span class="role-badge ${u.role}">${roleLabel(u)}</span>
+        ${(isAdmin() && u.role !== 'admin') ? `<button class="promote-btn" onclick="promoteUser('${u.id}')">Сделать админом</button>` : ''}
+      </div>`).join('');
+  }
+  function toggleUsersPanel(){
+    const p = $('users-panel');
+    const opening = p.style.display === 'none';
+    p.style.display = opening ? '' : 'none';
+    if (opening) loadUsers().then(renderUsersPanel);
+  }
+  async function promoteUser(userId){
+    if (!requireAdmin('Назначение админом')) return;
+    const users = await loadUsers();
+    const u = users.find(x => x.id === userId);
+    if (!u) return;
+    u.role = 'admin'; u.promoted = Date.now();
+    await saveUsers(users);
+    renderUsersPanel();
+    showNotice(`${u.firstName} ${u.lastName} теперь админ.`);
+  }
+  async function pollUsers(){
+    const users = await loadUsers();
+    if ($('users-panel').style.display !== 'none') renderUsersPanel();
+    if ($('page-classes').style.display !== 'none') renderParticipantsLeaderboard();
+    const mine = users.find(u => currentUser && u.id === currentUser.id);
+    if (mine){
+      const before = currentUser.role;
+      const need = reconcileRole(mine);
+      const pointsChanged = mine.points !== currentUser.points;
+      currentUser.points = mine.points;
+      if (need) saveUsers(users);
+      if (before !== currentUser.role || pointsChanged){
+        saveMyProfile(currentUser);
+        renderWhoAmI(); renderUsersPanel(); renderAll();
+        if (before !== currentUser.role) showNotice('Вас назначили админом.');
+      }
+    }
+  }
+  function showNotice(text){
+    const n = $('notice');
+    n.textContent = text; n.classList.add('show');
+    clearTimeout(showNotice._t);
+    showNotice._t = setTimeout(() => n.classList.remove('show'), 2600);
+  }
+
+  // ================= Рейтинг участников =================
+  const ROSTER = {"7а": ["Абілберіков Хасан", "Аманкельдин Айдын", "Амантай Мират", "Бексұлтан Рауан", "Гиниат Мират", "Даулет Дастан", "Жақсылық Айсұлтан", "ЖақсылықЕрсұлтан", "Жанағали Дінмұхаммед", "Закария Расұл", "Керимбай Халид", "Қалықов Санжар", "Қуаныш Дамир", "Мокушев Амир", "Мурат Арман", "Мураткалиев Али", "Нұржан Азиз", "Нұрыш Жан", "Орда Әлішер", "Өмірзақ Әлихан", "Салықбаев Әлинұр", "Сафи Бек", "Тайбукенов Таир", "Тоқтар Мәди", "Усенов Карим"], "7ә": ["Абай Әділ", "Амандық Нұралы", "Базарбай Аманжан", "Боранғали Дидар", "Ғали Нұрсұлтан", "Ғалымжанов Әділет", "Даулетов Абылайхан", "Ерболов Нұрлат", "Ернар Нұрәли", "Есенбаев Айдархан", "Имаш Талпын", "Истемиров Мирхан", "Кансултанов Азиз", "Кусетов Бекболат", "Қыдырбай Мұхаммедәли", "Мурзамуратов Нурсаид", "Ерланұлы Медет", "Нұрланов Бекарыс", "Нұрланов Арнұр", "Самбай Мұхаммед Әли", "Сансызбаев Данияр", "Сапаров Ералы", "Тілеш Мирас", "Шыңғыс Арсен", "Ілияс Абдусалям"], "8а": ["Аманкелді Бақтияр", "Амантай Санжар", "Аянұлы Алинур", "Базарбай Баубек", "Бердімұрат Ибраһим", "Гасер Бекзат", "Дельмагамбетов Жанибек", "Дәулеткерей Бектас", "Досмагамбетов Азат", "Ермек Ансар", "Жақсыбаев Бекет", "Жанатов Әділет", "Жарылғасын Абдулазиз", "Жетпісбай Нұрасыл", "Бирманов Дамир", "Жұмабеков Дарын", "Имашев Нұрдәулет", "Көптілеу Тлеш", "Қуат Дінмұхамед", "Мардонкулов Жаъфар", "Махамбет Ізбасар", "Мұса Яссауи", "Нұрқасын Хантөре", "Туленов Санжар", "Теміржан Ерсұлтан"], "8ә": ["Айтқали Арыстан", "Ақылбек Әділет", "Балтабай Наурызбай", "Баянгали Жангир", "Боранбай Санжар", "Ертерек Әділ", "Әбдіразақ Әмір", "Әділбек Ұлан", "Әлмырза Шадияр", "Жанабаев Санжар", "Коспаев Адильхан", "Кульманов Амир", "Қалжан Ерасыл", "Қожабай Дәулет", "Махсатбай Ғалымжан", "Мейржанұлы Хасан", "Нағашыбай Бекарыс", "Нұрғалиев Әміржан", "Нұрқасымов Нұрислам", "Отанбаев Турсынбек", "Рзалиев Ерасыл", "Сайран Бибарс", "Сейітқазы Дидахмет", "Суликанов Умар", "Тұрдалы Таир"], "9а": ["Ақылбек Сардар", "Аманғос Омарәлім", "Аширгали Алишер", "Базарбай Өміржан", "Бердімұрат Ахмет", "Ғабит Абубакр", "Даулетов Жангир", "Джусупов Амирхан", "Жайықұлы Хаким", "Жангельдиев Данияр", "Жандосұлы Жансерік", "Караман Тамерлан Еркебуланулы", "Кәдір Айбар", "Кубенкулов Даулен Тимерканович", "Мұхамбет Бекалы", "Наурыз Әмірхан", "Орда Дастан", "Серіков Темірлан", "Тайшиев Дамир", "Талғатұлы Ғибрат", "Танкиев Ескендір", "Турдыбеков Алихан", "Уайсбаев Альтаир", "Ұланұлы Алимхан", "Хажиолиев Төлеген"], "9ә": ["Абай Ерасыл", "Акжулов Жарылқасын", "Алимов Арман", "Ахмет Сұлтан", "Ахметов Шыңғыс", "Бақтыгереев Нұрдос", "Ғалымжан Нұрислам", "Елеусіз Бекарыс", "Ермуханов Ислам", "Әбидолла Бақтияр", "Жақсыбаев Есет", "Жақып Расим", "Жонысов Ахмет", "Илиясов Ерсултан", "Кулфаизов Досан", "Қаирғали Өркен", "Қайырбек Нұрасыл", "Мұсаев Мағжан", "Наурызбай Әділет", "Оңдасын Әділхан", "Оразов Азамат", "Сабыр Санжар", "Тажгуразов Санат", "Таубай Еркебұлан", "Хамит Даниал"], "10а": ["Азмуханов Алим", "Али Ахмет", "Алтайулы Али", "Бақыт Сұлтан", "Бегалы Ахмад", "Бисенгалиев Ислам", "Варин Марк", "Досанов Батыр", "Дүйсенбаев Ораз", "Ерғали Тамерлан", "Еркін Диас", "Ернар Арнат", "Әменов Омар", "Жумажанов Азамат", "Латиф Дамир", "Михальченко Ильфат", "Мұрзақан Мадияр", "Нагашибаев Амир", "Наурзбаев Исмаил", "Нығмет Әбдірасул", "Тимурұлы Абдуллаһ", "Тлеумбетов Ерамир", "Турмахан Нұртас", "Шакирбай Рахман", "Шөкей Бауыржан"], "10ә": ["Ауданбаев Нұртас", "Ахметкалиев Гумар", "Бахытқали Бауыржан", "Бурумбаев Ауез", "Ермекбай Нұрислам", "Есберген Қайсар", "Есеналин Нұржан", "Есенкулов Мирас", "Жангельдин Бекзат", "Жаңбырбаев Нұрдәулет", "Косанов Алишер", "Майор Әсет", "Мұрат Алихан", "Нұржанов Қуантқан", "Омар Нұрасыл", "Орынбасар Расул", "Карабалин Бейбарыс", "Рахимов Аман", "Рахманов Даниал", "Садык Мансур", "Саматов Ерасыл", "Сейтқазиев Нұрсейіт", "Сұлтанбек Салих", "Талғатұлы Әділет", "Таяу Сүлеймен", "Тулеген Расул"], "11а": ["Абубакиров Жанибек", "Аманжан Әли", "Әмірхан Нұрмұхамед", "Барлық Исламбек", "Болат Олжас", "Жандәулет Асхат", "Жұмабек Санжар", "Давлетов Есентай", "Қазанбаев Сүлеймен", "Қыдырбай Нұрислам", "Маратов Тамир", "Мәлік Нұртай", "Мухтубаев Али", "Мыңбай Санжар", "Манарбеков Диас", "Нұрмұхан Нұрали", "Рат Мадияр", "Суйесинов Алмаз", "Тайжан Асылбек", "Танирбергенов Ануар", "Теңелғали Бекарыстан", "Тлеумбетов Инкарбек", "Хамит Дінислам", "Шоқат Шыңғыс", "Шүйншбай Актілек"], "11ә": ["Акжанбеков Нурдаулет", "Ақпанов Арсен", "Амантай Ырысбек", "Асхат Ерасыл", "Әбілов Бекнұр", "Бодаш Қасым", "Дүйжанов Арсен", "Жайықұлы Мұхаммед", "Жақия Әділжан", "Жалгаспай Әділ", "Жолдыбай Ибрагим", "Жумабеков Манас", "Исмагулов Данияр", "Қыдырұлы Хасан", "Мамбеталы Сұлтанбейбарыс", "Ниетов Асыл", "Нұрхан Нұрлан", "Орал Әли", "Рахметов Даулет", "Сағынғали Абдуссаттар", "Садыков Аланур", "Хамит Арсен", "Іскендір Әлихан"]};
+  const CLASS_NAMES = Object.keys(ROSTER);
+  const TUTORS = ["Қуаныш аби", "Мадиар аби", "Асылхан аби", "Шапағат аби", "Өмірсерік аби", "Диас аби", "Алмат аби", "Әлсейіт аби", "Д Әділет аби", "Абылай аби", "Қ Әділет аби", "Ерасыл аби"];
+  const CLASS_COLORS = ["#1F3A66","#8A6A1E","#7A2E3A","#5B3E8E","#1F6F78","#4B4640","#8A5A2B","#2E4A7A","#6B4226","#3C6E71"];
+  function classColor(id){ const i = CLASS_NAMES.indexOf(id); return i === -1 ? "#4B4640" : CLASS_COLORS[i % CLASS_COLORS.length]; }
+
+  function renderParticipantsLeaderboard(){
+    const el = $('leaderboard');
+    if (!el) return;
+    const ranked = [...usersCache].sort((a, b) => (b.points || 0) - (a.points || 0));
+    const medals = ["🥇", "🥈", "🥉"];
+    if (!ranked.length){ el.innerHTML = `<div class="users-empty">Пока никто не зарегистрирован.</div>`; return; }
+    el.innerHTML = ranked.map((u, i) => {
+      const tier = i < 3 ? 'top' + (i + 1) : '';
+      const c = classColor(u.classOrRole);
+      const rankStyle = i < 3 ? '' : `style="background:${c}22;color:${c};"`;
+      const fullName = `${u.firstName} ${u.lastName}`;
+      return `<div class="leader-row ${tier}">
+        <span class="leader-rank ${tier}" ${rankStyle}>${i < 3 ? medals[i] : (i + 1)}</span>
+        ${avatarHTML(fullName, 26)}
+        <span class="leader-name">${esc(fullName)}</span>
+        <span class="role-badge" style="background:${c}22;color:${c};">${esc(u.classOrRole)}</span>
+        <span class="leader-points" style="color:${c}">${u.points || 0} б.</span>
+      </div>`;
+    }).join('');
+  }
+
+  function showPage(page){
+    if (page === 'classes' && !isAdmin()) page = 'lostfound';
+    $('page-lostfound').style.display = page === 'lostfound' ? '' : 'none';
+    $('page-classes').style.display = page === 'classes' ? '' : 'none';
+    $('nav-lostfound').classList.toggle('active', page === 'lostfound');
+    $('nav-classes').classList.toggle('active', page === 'classes');
+    if (page === 'classes') renderParticipantsLeaderboard();
+  }
+
+  // ---------- вещи ----------
+  const loadItems = () => loadShared('items');
+  const saveItems = items => saveShared('items', items);
+  const FOUND_LIFETIME_MS = 60 * 60 * 1000;
+
+  async function init(){
+    const loaded = await loadItems();
+    if (loaded && loaded.length){
+      state.items = loaded.map(it => (it.status === "found" && !it.foundAt) ? {...it, foundAt: Date.now()} : it);
+    } else {
+      state.items = SEED_ITEMS;
+      saveItems(state.items);
+    }
+    cleanupExpired();
+    renderAll();
+    setInterval(pollForUpdates, 6000);
+    setInterval(secondTick, 1000);
+  }
+  function secondTick(){
+    let expired = false;
+    state.items.forEach(it => {
+      if (it.status !== "found" || !it.foundAt) return;
+      const remain = it.foundAt + FOUND_LIFETIME_MS - Date.now();
+      if (remain <= 0){ expired = true; return; }
+      const el = $('ttl-' + it.id);
+      if (el) el.textContent = formatCountdown(remain);
+    });
+    if (expired) cleanupExpired();
+  }
+  function cleanupExpired(){
+    const cutoff = Date.now() - FOUND_LIFETIME_MS;
+    const before = state.items.length;
+    state.items = state.items.filter(it => !(it.status === "found" && it.foundAt && it.foundAt < cutoff));
+    if (state.items.length !== before){ renderAll(); saveItems(state.items); }
+  }
+  function formatCountdown(ms){
+    const t = Math.max(0, Math.ceil(ms / 1000));
+    return `${String(Math.floor(t / 60)).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+  }
+  function formatRemaining(foundAt){
+    if (!foundAt) return null;
+    const r = foundAt + FOUND_LIFETIME_MS - Date.now();
+    return r <= 0 ? null : formatCountdown(r);
+  }
+  async function pollForUpdates(){
+    if ($('modal-root').children.length) return;
+    const loaded = await loadItems();
+    if (!loaded) return;
+    const fixed = loaded.map(it => (it.status === "found" && !it.foundAt) ? {...it, foundAt: Date.now()} : it);
+    if (JSON.stringify(fixed) !== JSON.stringify(state.items)){ state.items = fixed; renderAll(); }
+    cleanupExpired();
+  }
+
+  function esc(str){
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+  function formatDate(iso){
+    const d = new Date(iso + "T00:00:00");
+    return isNaN(d) ? iso : d.toLocaleDateString("ru-RU", { day:"numeric", month:"short", year:"numeric" });
+  }
+  function filteredItems(){
+    const q = state.query.trim().toLowerCase();
+    return state.items.filter(it => {
+      if (state.statusFilter !== "all" && it.status !== state.statusFilter) return false;
+      if (state.categoryFilter !== "all" && it.category !== state.categoryFilter) return false;
+      if (q && !(it.title + " " + it.description + " " + it.location).toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }
+
+  function renderAll(){ renderStats(); renderFilters(); renderGrid(); }
+  function renderStats(){
+    const total = state.items.length;
+    const found = state.items.filter(i => i.status === "found").length;
+    $('stats').innerHTML = `
+      <div class="stat"><span class="dot" style="background:#1C1B19"></span><b>${total}</b><span class="label">Всего вещей</span></div>
+      <div class="stat"><span class="dot" style="background:#C63D2F"></span><b>${total - found}</b><span class="label">Не найдено</span></div>
+      <div class="stat"><span class="dot" style="background:#147A4B"></span><b>${found}</b><span class="label">Найдено</span></div>`;
+  }
+  function renderFilters(){
+    const total = state.items.length;
+    const found = state.items.filter(i => i.status === "found").length;
+    const tabs = [{key:"all",label:"Все",count:total},{key:"lost",label:"Не найдено",count:total-found},{key:"found",label:"Найдено",count:found}];
+    const pills = tabs.map(t => `<button class="pill ${state.statusFilter===t.key?'active':''}" onclick="setStatusFilter('${t.key}')">${t.label} <span class="count">· ${t.count}</span></button>`).join('');
+    const opts = CATEGORIES.map(c => `<option value="${esc(c)}" ${state.categoryFilter===c?'selected':''}>${esc(c)}</option>`).join('');
+    $('filters').innerHTML = `<div class="pill-group">${pills}</div>
+      <select class="cat-select" onchange="setCategoryFilter(this.value)">
+        <option value="all" ${state.categoryFilter==='all'?'selected':''}>Все категории</option>${opts}
+      </select>`;
+  }
+
+  const pinSVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  const calSVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  const checkSVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  const placeholderSVG = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+  const clockSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>`;
+
+  function cardHTML(item){
+    const isFound = item.status === "found";
+    const cc = categoryColor(item.category);
+    const photo = item.photo ? `<img src="${esc(item.photo)}" alt="${esc(item.title)}" />` : `<div class="placeholder">${placeholderSVG}</div>`;
+    return `
+      <div class="card-accent" style="background:${cc.fg}"></div>
+      <div class="card-photo">${photo}
+        <div class="badge-id">№ ${esc(item.id)}</div>
+        <div class="badge-status ${isFound?'found':'lost'}">${isFound ? '✓ Найдено' : '🔴 Не найдено'}</div>
+        ${isFound ? `<div class="stamp">${checkSVG}</div>` : ''}
+      </div>
+      <div class="perforation"></div>
+      <div class="card-body">
+        <h3>${esc(item.title)}</h3>
+        <div class="meta">
+          <span>${pinSVG} ${esc(item.location)}</span>
+          <span>${calSVG} ${formatDate(item.date)}</span>
+          ${isFound && formatRemaining(item.foundAt) ? `<span class="ttl">${clockSVG} исчезнет через <span id="ttl-${esc(item.id)}">${formatRemaining(item.foundAt)}</span></span>` : ''}
+          ${item.reportedBy ? `<span>${avatarHTML(item.reportedBy, 16)} добавил(а): ${esc(item.reportedBy)}</span>` : ''}
+        </div>
+        <p class="desc">${esc(item.description)}</p>
+        <div class="card-footer">
+          <span class="cat-tag" style="background:${cc.bg};color:${cc.fg};">${esc(item.category)}</span>
+          ${(!isFound && isAdmin()) ? `<button class="mark-btn" onclick="event.stopPropagation();markFound('${item.id}')">Отметить как найдено</button>` : ''}
+        </div>
+      </div>`;
+  }
+  function renderGrid(){
+    const items = filteredItems();
+    const grid = $('grid');
+    if (!items.length){
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${placeholderSVG}<p style="font-size:14.5px;margin:8px 0 0">Ничего не нашлось. Попробуйте изменить фильтры или запрос.</p></div>`;
+      return;
+    }
+    grid.innerHTML = items.map(it => `<div class="card ${state.justFoundId===it.id?'just-found':''}" id="card-${it.id}" onclick="openDetail('${it.id}')">${cardHTML(it)}</div>`).join('');
+  }
+
+  function onSearch(v){ state.query = v; renderGrid(); }
+  function setStatusFilter(k){ state.statusFilter = k; renderFilters(); renderGrid(); }
+  function setCategoryFilter(v){ state.categoryFilter = v; renderGrid(); }
+
+  async function markFound(id){
+    if (!requireAdmin('Отметка "Найдено"')) return;
+    state.items = state.items.map(it => it.id === id ? {...it, status:"found", foundAt: Date.now()} : it);
+    state.justFoundId = id;
+    renderAll();
+    saveItems(state.items);
+    setTimeout(() => { state.justFoundId = null; }, 900);
+  }
+
+  // ---------- окно с полным описанием ----------
+  function openDetail(id){
+    const it = state.items.find(x => x.id === id);
+    if (!it) return;
+    const isFound = it.status === "found";
+    const cc = categoryColor(it.category);
+    const photo = it.photo ? `<img src="${esc(it.photo)}" alt="${esc(it.title)}" />` : `<div class="placeholder">${placeholderSVG}</div>`;
+    const ttl = isFound && formatRemaining(it.foundAt) ? `<span style="color:var(--green)">${clockSVG} исчезнет из списка через ${formatRemaining(it.foundAt)}</span>` : '';
+    $('modal-root').innerHTML = `
+      <div class="overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+          <div class="detail-photo">${photo}
+            <div class="badge-id">№ ${esc(it.id)}</div>
+            <div class="badge-status ${isFound?'found':'lost'}" style="right:54px">${isFound ? '✓ Найдено' : '🔴 Не найдено'}</div>
+            <button class="close-btn" style="position:absolute;top:8px;right:10px;background:rgba(255,255,255,0.9)" onclick="closeModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div><span class="cat-tag" style="background:${cc.bg};color:${cc.fg};">${esc(it.category)}</span></div>
+            <h2 class="detail-title">${esc(it.title)}</h2>
+            <div>
+              <div class="detail-label">Описание</div>
+              <p class="detail-desc">${esc(it.description)}</p>
+            </div>
+            <div class="detail-meta">
+              <span>${pinSVG} ${esc(it.location)}</span>
+              <span>${calSVG} ${formatDate(it.date)}</span>
+              ${it.reportedBy ? `<span>${avatarHTML(it.reportedBy, 18)} Добавил(а): ${esc(it.reportedBy)}</span>` : ''}
+              ${ttl}
+            </div>
+            ${(!isFound && isAdmin()) ? `<button class="submit-btn" style="background:var(--green)" onclick="markFound('${it.id}');closeModal()">Отметить как найдено</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ---------- модальное окно ----------
+  function openModal(){
+    draftPhoto = null;
+    const opts = CATEGORIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    const today = new Date().toISOString().slice(0,10);
+    $('modal-root').innerHTML = `
+      <div class="overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+          <div class="modal-head"><h2>Добавить вещь</h2>
+            <button class="close-btn" onclick="closeModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="modal-body">
+            <label class="photo-drop" for="photo-input">
+              <img id="photo-preview" />
+              <span id="photo-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16"/></svg>
+                <span style="font-size:13px;">Добавить фото</span>
+              </span>
+              <input id="photo-input" type="file" accept="image/*" style="display:none" onchange="onPhotoChange(event)" />
+            </label>
+            <div class="field"><span>Название вещи</span><input id="f-title" placeholder="Например, синий рюкзак" /></div>
+            <div class="field"><span>Место потери</span><input id="f-location" placeholder="Где вы потеряли вещь" /></div>
+            <div class="row-2">
+              <div class="field"><span>Дата</span><input id="f-date" type="date" value="${today}" /></div>
+              <div class="field"><span>Категория</span><select id="f-category">${opts}</select></div>
+            </div>
+            <div class="field"><span>Описание</span><textarea id="f-description" rows="3" placeholder="Приметы, цвет, содержимое..."></textarea></div>
+            <button class="submit-btn" id="submit-btn" onclick="submitItem()">Разместить объявление</button>
+          </div>
+        </div>
+      </div>`;
+    $('f-title').addEventListener('input', updateSubmitState);
+    $('f-location').addEventListener('input', updateSubmitState);
+    updateSubmitState();
+  }
+  function updateSubmitState(){
+    $('submit-btn').disabled = !($('f-title').value.trim() && $('f-location').value.trim());
+  }
+  // Фото сжимается, чтобы уложиться в лимит размера документа хранилища
+  function onPhotoChange(e){
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const k = Math.min(1, 480 / Math.max(im.width, im.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        draftPhoto = c.toDataURL('image/jpeg', 0.6);
+        const img = $('photo-preview');
+        img.src = draftPhoto; img.style.display = 'block';
+        $('photo-placeholder').style.display = 'none';
+      };
+      im.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  function closeModal(){ $('modal-root').innerHTML = ''; }
+
+  async function submitItem(){
+    const title = $('f-title').value.trim();
+    const location = $('f-location').value.trim();
+    if (!title || !location) return;
+    const description = $('f-description').value.trim() || "Без описания.";
+    const date = $('f-date').value;
+    const category = $('f-category').value;
+    const id = String(Math.floor(10000 + Math.random() * 89999));
+    const reportedBy = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : null;
+    state.items = [{ id, title, description, location, date, category, status:"lost", photo: draftPhoto, reportedBy }, ...state.items];
+    closeModal();
+    renderAll();
+    saveItems(state.items);
+    await awardReportPoint();
+  }
+  async function awardReportPoint(){
+    if (!currentUser) return;
+    const users = await loadUsers();
+    const u = users.find(x => x.id === currentUser.id);
+    if (u){ u.points = (u.points || 0) + 1; currentUser.points = u.points; }
+    else { currentUser.points = (currentUser.points || 0) + 1; users.push(currentUser); }
+    await saveUsers(users);
+    saveMyProfile(currentUser);
+    renderWhoAmI();
+    if ($('page-classes').style.display !== 'none') renderParticipantsLeaderboard();
+  }
+
+  bootAuth();
+</script>
+</body>
+</html>
